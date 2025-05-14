@@ -1,0 +1,13 @@
+{
+  "name": "calendly-soap-tests",
+  "version": "1.0.0",
+  "description": "Tests for comparing REST and SOAP APIs",
+  "main": "api-comparison.js",
+  "scripts": {
+    "test": "node api-comparison.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "soap": "^1.0.0"
+  }
+} 

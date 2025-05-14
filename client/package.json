@@ -1,0 +1,12 @@
+{
+  "name": "calendly-clone-soap-client",
+  "version": "1.0.0",
+  "description": "SOAP client example for Calendly Clone",
+  "main": "example.js",
+  "scripts": {
+    "start": "node example.js"
+  },
+  "dependencies": {
+    "soap": "^1.0.0"
+  }
+} 

@@ -1,0 +1,983 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="CalendlyService"
+  targetNamespace="http://localhost:3001/wsdl"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:tns="http://localhost:3001/wsdl"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:cal="http://localhost:3001/wsdl">
+
+  <!-- Type Definitions -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://localhost:3001/wsdl" elementFormDefault="qualified">
+
+      <!-- Common Complex Types -->      <xsd:complexType name="User">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="name" type="xsd:string"/>
+          <xsd:element name="email" type="xsd:string"/>
+          <xsd:element name="password" type="xsd:string"/>
+          <xsd:element name="timezone" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="token" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Event">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="name" type="xsd:string"/>
+          <xsd:element name="duration" type="xsd:int"/>
+          <xsd:element name="description" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="color" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="userId" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="TimeSlot">
+        <xsd:sequence>
+          <xsd:element name="day" type="cal:DayOfWeek"/>
+          <xsd:element name="startTime" type="xsd:string"/>
+          <xsd:element name="endTime" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Schedule">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="userId" type="xsd:string"/>
+          <xsd:element name="availability" type="cal:TimeSlot" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Appointment">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+          <xsd:element name="eventId" type="xsd:string"/>
+          <xsd:element name="userId" type="xsd:string"/>
+          <xsd:element name="inviteeEmail" type="xsd:string"/>
+          <xsd:element name="startTime" type="xsd:dateTime"/>
+          <xsd:element name="endTime" type="xsd:dateTime"/>
+          <xsd:element name="status" type="cal:AppointmentStatus" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Pagination">
+        <xsd:sequence>
+          <xsd:element name="page" type="xsd:int"/>
+          <xsd:element name="pageSize" type="xsd:int"/>
+          <xsd:element name="total" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="ErrorResponse">
+        <xsd:sequence>
+          <xsd:element name="message" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:simpleType name="DayOfWeek">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="monday"/>
+          <xsd:enumeration value="tuesday"/>
+          <xsd:enumeration value="wednesday"/>
+          <xsd:enumeration value="thursday"/>
+          <xsd:enumeration value="friday"/>
+          <xsd:enumeration value="saturday"/>
+          <xsd:enumeration value="sunday"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <xsd:simpleType name="AppointmentStatus">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="scheduled"/>
+          <xsd:enumeration value="canceled"/>
+          <xsd:enumeration value="completed"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <!-- Request and Response Messages for Users -->
+      <xsd:element name="GetUsersRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="page" type="xsd:int" default="1"/>
+            <xsd:element name="pageSize" type="xsd:int" default="20"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="GetUsersResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="users" type="cal:User" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="pagination" type="cal:Pagination"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="CreateUserRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="user" type="cal:User"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="CreateUserResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="user" type="cal:User"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetUserRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="userId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetUserResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="user" type="cal:User"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateUserRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="userId" type="xsd:string"/>
+            <xsd:element name="name" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="password" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="timezone" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateUserResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="user" type="cal:User"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteUserRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="userId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteUserResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="success" type="xsd:boolean"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- Authentication Messages -->
+      <xsd:element name="CreateSessionRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="email" type="xsd:string"/>
+            <xsd:element name="password" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="CreateSessionResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="user" type="cal:User"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteSessionRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteSessionResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- Events Messages -->
+      <xsd:element name="CreateEventRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="event" type="cal:Event"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="CreateEventResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="event" type="cal:Event"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetEventsRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetEventsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="events" type="cal:Event" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetEventRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="eventId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetEventResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="event" type="cal:Event"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateEventRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="eventId" type="xsd:string"/>
+            <xsd:element name="name" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="duration" type="xsd:int" minOccurs="0"/>
+            <xsd:element name="description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="color" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateEventResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="event" type="cal:Event"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteEventRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="eventId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteEventResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="success" type="xsd:boolean"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- Schedules Messages -->
+      <xsd:element name="CreateScheduleRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="schedule" type="cal:Schedule"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="CreateScheduleResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="schedule" type="cal:Schedule"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetSchedulesRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetSchedulesResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="schedules" type="cal:Schedule" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetScheduleRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="userId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetScheduleResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="schedule" type="cal:Schedule"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateScheduleRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="userId" type="xsd:string"/>
+            <xsd:element name="availability" type="cal:TimeSlot" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateScheduleResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="schedule" type="cal:Schedule"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteScheduleRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="userId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteScheduleResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="success" type="xsd:boolean"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- Appointments Messages -->
+      <xsd:element name="CreateAppointmentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="appointment" type="cal:Appointment"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="CreateAppointmentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="appointment" type="cal:Appointment"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetAppointmentsRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetAppointmentsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="appointments" type="cal:Appointment" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetAppointmentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="appointmentId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GetAppointmentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="appointment" type="cal:Appointment"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateAppointmentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="appointmentId" type="xsd:string"/>
+            <xsd:element name="eventId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="inviteeEmail" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="startTime" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="endTime" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="status" type="cal:AppointmentStatus" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UpdateAppointmentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="appointment" type="cal:Appointment"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteAppointmentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+            <xsd:element name="appointmentId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="DeleteAppointmentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="success" type="xsd:boolean"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+
+  <!-- Messages -->
+  <!-- User Operations -->
+  <wsdl:message name="GetUsersRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetUsersRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetUsersResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetUsersResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateUserRequestMessage">
+    <wsdl:part name="parameters" element="cal:CreateUserRequest"/>
+  </wsdl:message>
+  <wsdl:message name="CreateUserResponseMessage">
+    <wsdl:part name="parameters" element="cal:CreateUserResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetUserRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetUserRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetUserResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetUserResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="UpdateUserRequestMessage">
+    <wsdl:part name="parameters" element="cal:UpdateUserRequest"/>
+  </wsdl:message>
+  <wsdl:message name="UpdateUserResponseMessage">
+    <wsdl:part name="parameters" element="cal:UpdateUserResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteUserRequestMessage">
+    <wsdl:part name="parameters" element="cal:DeleteUserRequest"/>
+  </wsdl:message>
+  <wsdl:message name="DeleteUserResponseMessage">
+    <wsdl:part name="parameters" element="cal:DeleteUserResponse"/>
+  </wsdl:message>
+
+  <!-- Authentication Operations -->
+  <wsdl:message name="CreateSessionRequestMessage">
+    <wsdl:part name="parameters" element="cal:CreateSessionRequest"/>
+  </wsdl:message>
+  <wsdl:message name="CreateSessionResponseMessage">
+    <wsdl:part name="parameters" element="cal:CreateSessionResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteSessionRequestMessage">
+    <wsdl:part name="parameters" element="cal:DeleteSessionRequest"/>
+  </wsdl:message>
+  <wsdl:message name="DeleteSessionResponseMessage">
+    <wsdl:part name="parameters" element="cal:DeleteSessionResponse"/>
+  </wsdl:message>
+
+  <!-- Events Operations -->
+  <wsdl:message name="CreateEventRequestMessage">
+    <wsdl:part name="parameters" element="cal:CreateEventRequest"/>
+  </wsdl:message>
+  <wsdl:message name="CreateEventResponseMessage">
+    <wsdl:part name="parameters" element="cal:CreateEventResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetEventsRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetEventsRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetEventsResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetEventsResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetEventRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetEventRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetEventResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetEventResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="UpdateEventRequestMessage">
+    <wsdl:part name="parameters" element="cal:UpdateEventRequest"/>
+  </wsdl:message>
+  <wsdl:message name="UpdateEventResponseMessage">
+    <wsdl:part name="parameters" element="cal:UpdateEventResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteEventRequestMessage">
+    <wsdl:part name="parameters" element="cal:DeleteEventRequest"/>
+  </wsdl:message>
+  <wsdl:message name="DeleteEventResponseMessage">
+    <wsdl:part name="parameters" element="cal:DeleteEventResponse"/>
+  </wsdl:message>
+
+  <!-- Schedules Operations -->
+  <wsdl:message name="CreateScheduleRequestMessage">
+    <wsdl:part name="parameters" element="cal:CreateScheduleRequest"/>
+  </wsdl:message>
+  <wsdl:message name="CreateScheduleResponseMessage">
+    <wsdl:part name="parameters" element="cal:CreateScheduleResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetSchedulesRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetSchedulesRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetSchedulesResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetSchedulesResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetScheduleRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetScheduleRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetScheduleResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetScheduleResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="UpdateScheduleRequestMessage">
+    <wsdl:part name="parameters" element="cal:UpdateScheduleRequest"/>
+  </wsdl:message>
+  <wsdl:message name="UpdateScheduleResponseMessage">
+    <wsdl:part name="parameters" element="cal:UpdateScheduleResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteScheduleRequestMessage">
+    <wsdl:part name="parameters" element="cal:DeleteScheduleRequest"/>
+  </wsdl:message>
+  <wsdl:message name="DeleteScheduleResponseMessage">
+    <wsdl:part name="parameters" element="cal:DeleteScheduleResponse"/>
+  </wsdl:message>
+
+  <!-- Appointments Operations -->
+  <wsdl:message name="CreateAppointmentRequestMessage">
+    <wsdl:part name="parameters" element="cal:CreateAppointmentRequest"/>
+  </wsdl:message>
+  <wsdl:message name="CreateAppointmentResponseMessage">
+    <wsdl:part name="parameters" element="cal:CreateAppointmentResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetAppointmentsRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetAppointmentsRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetAppointmentsResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetAppointmentsResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetAppointmentRequestMessage">
+    <wsdl:part name="parameters" element="cal:GetAppointmentRequest"/>
+  </wsdl:message>
+  <wsdl:message name="GetAppointmentResponseMessage">
+    <wsdl:part name="parameters" element="cal:GetAppointmentResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="UpdateAppointmentRequestMessage">
+    <wsdl:part name="parameters" element="cal:UpdateAppointmentRequest"/>
+  </wsdl:message>
+  <wsdl:message name="UpdateAppointmentResponseMessage">
+    <wsdl:part name="parameters" element="cal:UpdateAppointmentResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="DeleteAppointmentRequestMessage">
+    <wsdl:part name="parameters" element="cal:DeleteAppointmentRequest"/>
+  </wsdl:message>
+  <wsdl:message name="DeleteAppointmentResponseMessage">
+    <wsdl:part name="parameters" element="cal:DeleteAppointmentResponse"/>
+  </wsdl:message>
+
+  <!-- PortType -->
+  <wsdl:portType name="CalendlyPortType">
+    <!-- User Operations -->
+    <wsdl:operation name="GetUsers">
+      <wsdl:input message="tns:GetUsersRequestMessage"/>
+      <wsdl:output message="tns:GetUsersResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="CreateUser">
+      <wsdl:input message="tns:CreateUserRequestMessage"/>
+      <wsdl:output message="tns:CreateUserResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetUser">
+      <wsdl:input message="tns:GetUserRequestMessage"/>
+      <wsdl:output message="tns:GetUserResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUser">
+      <wsdl:input message="tns:UpdateUserRequestMessage"/>
+      <wsdl:output message="tns:UpdateUserResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteUser">
+      <wsdl:input message="tns:DeleteUserRequestMessage"/>
+      <wsdl:output message="tns:DeleteUserResponseMessage"/>
+    </wsdl:operation>
+
+    <!-- Authentication Operations -->
+    <wsdl:operation name="CreateSession">
+      <wsdl:input message="tns:CreateSessionRequestMessage"/>
+      <wsdl:output message="tns:CreateSessionResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSession">
+      <wsdl:input message="tns:DeleteSessionRequestMessage"/>
+      <wsdl:output message="tns:DeleteSessionResponseMessage"/>
+    </wsdl:operation>
+
+    <!-- Events Operations -->
+    <wsdl:operation name="CreateEvent">
+      <wsdl:input message="tns:CreateEventRequestMessage"/>
+      <wsdl:output message="tns:CreateEventResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetEvents">
+      <wsdl:input message="tns:GetEventsRequestMessage"/>
+      <wsdl:output message="tns:GetEventsResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetEvent">
+      <wsdl:input message="tns:GetEventRequestMessage"/>
+      <wsdl:output message="tns:GetEventResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateEvent">
+      <wsdl:input message="tns:UpdateEventRequestMessage"/>
+      <wsdl:output message="tns:UpdateEventResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteEvent">
+      <wsdl:input message="tns:DeleteEventRequestMessage"/>
+      <wsdl:output message="tns:DeleteEventResponseMessage"/>
+    </wsdl:operation>
+
+    <!-- Schedules Operations -->
+    <wsdl:operation name="CreateSchedule">
+      <wsdl:input message="tns:CreateScheduleRequestMessage"/>
+      <wsdl:output message="tns:CreateScheduleResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetSchedules">
+      <wsdl:input message="tns:GetSchedulesRequestMessage"/>
+      <wsdl:output message="tns:GetSchedulesResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetSchedule">
+      <wsdl:input message="tns:GetScheduleRequestMessage"/>
+      <wsdl:output message="tns:GetScheduleResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSchedule">
+      <wsdl:input message="tns:UpdateScheduleRequestMessage"/>
+      <wsdl:output message="tns:UpdateScheduleResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSchedule">
+      <wsdl:input message="tns:DeleteScheduleRequestMessage"/>
+      <wsdl:output message="tns:DeleteScheduleResponseMessage"/>
+    </wsdl:operation>
+
+    <!-- Appointments Operations -->
+    <wsdl:operation name="CreateAppointment">
+      <wsdl:input message="tns:CreateAppointmentRequestMessage"/>
+      <wsdl:output message="tns:CreateAppointmentResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetAppointments">
+      <wsdl:input message="tns:GetAppointmentsRequestMessage"/>
+      <wsdl:output message="tns:GetAppointmentsResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetAppointment">
+      <wsdl:input message="tns:GetAppointmentRequestMessage"/>
+      <wsdl:output message="tns:GetAppointmentResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAppointment">
+      <wsdl:input message="tns:UpdateAppointmentRequestMessage"/>
+      <wsdl:output message="tns:UpdateAppointmentResponseMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAppointment">
+      <wsdl:input message="tns:DeleteAppointmentRequestMessage"/>
+      <wsdl:output message="tns:DeleteAppointmentResponseMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <!-- Binding -->
+  <wsdl:binding name="CalendlySOAPBinding" type="tns:CalendlyPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>    <!-- User Operations -->
+    <wsdl:operation name="GetUsers">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetUsers"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>    <wsdl:operation name="CreateUser">
+      <soap:operation soapAction="http://localhost:3001/wsdl/CreateUser"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetUser">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetUser"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="UpdateUser">
+      <soap:operation soapAction="http://localhost:3001/wsdl/UpdateUser"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteUser">
+      <soap:operation soapAction="http://localhost:3001/wsdl/DeleteUser"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <!-- Authentication Operations -->
+    <wsdl:operation name="CreateSession">
+      <soap:operation soapAction="http://localhost:3001/wsdl/CreateSession"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteSession">
+      <soap:operation soapAction="http://localhost:3001/wsdl/DeleteSession"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <!-- Events Operations -->
+    <wsdl:operation name="CreateEvent">
+      <soap:operation soapAction="http://localhost:3001/wsdl/CreateEvent"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetEvents">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetEvents"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetEvent">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetEvent"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="UpdateEvent">
+      <soap:operation soapAction="http://localhost:3001/wsdl/UpdateEvent"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteEvent">
+      <soap:operation soapAction="http://localhost:3001/wsdl/DeleteEvent"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <!-- Schedules Operations -->
+    <wsdl:operation name="CreateSchedule">
+      <soap:operation soapAction="http://localhost:3001/wsdl/CreateSchedule"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetSchedules">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetSchedules"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetSchedule">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetSchedule"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="UpdateSchedule">
+      <soap:operation soapAction="http://localhost:3001/wsdl/UpdateSchedule"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteSchedule">
+      <soap:operation soapAction="http://localhost:3001/wsdl/DeleteSchedule"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <!-- Appointments Operations -->
+    <wsdl:operation name="CreateAppointment">
+      <soap:operation soapAction="http://localhost:3001/wsdl/CreateAppointment"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetAppointments">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetAppointments"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetAppointment">
+      <soap:operation soapAction="http://localhost:3001/wsdl/GetAppointment"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="UpdateAppointment">
+      <soap:operation soapAction="http://localhost:3001/wsdl/UpdateAppointment"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DeleteAppointment">
+      <soap:operation soapAction="http://localhost:3001/wsdl/DeleteAppointment"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <!-- Service -->
+  <wsdl:service name="CalendlyService">
+    <wsdl:documentation>SOAP service for Calendly-like appointment scheduling system</wsdl:documentation>
+    <wsdl:port name="CalendlyPort" binding="tns:CalendlySOAPBinding">
+      <soap:address location="http://localhost:3001/soap"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -34,25 +34,24 @@ The SOAP API provides identical functionality to the REST API, including:
 
 1. Clone the repository:
 
-```bash
-git clone https://github.com/your-username/calendly-clone-soap-api.git
-cd calendly-clone-soap-api
-```
-
 2. Install dependencies:
 
 ```bash
+# Install Rest api dependencies
+npm install
+
 # Install SOAP service dependencies
-cd src/soap-service
+cd /src/soap-service
 npm install
 
 # Install client example dependencies
-cd ../../client
+cd /client
 npm install
 
 # Install test dependencies
-cd ../tests
+cd /tests
 npm install
+
 ```
 
 ## Running the Service
@@ -74,9 +73,17 @@ This will:
 
 Alternatively, you can start the service manually:
 
+Rest api service
+
+```bash
+npm start
+
+```
+SOAP service
 ```bash
 cd src/soap-service
 npm start
+
 ```
 
 The service will be available at:
@@ -108,6 +115,12 @@ To run the tests:
 
 ```bash
 ./tests/test.sh
+
+or
+
+cd /tests
+npm i
+node api-comparison.js
 ```
 
 ### Test Requirements

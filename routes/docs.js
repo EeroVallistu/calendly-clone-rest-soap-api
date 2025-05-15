@@ -6,7 +6,6 @@ const path = require('path');
 
 // Load both language versions and main API spec
 const englishSpec = YAML.load(path.join(__dirname, '../docs/en/api.yaml'));
-const estonianSpec = YAML.load(path.join(__dirname, '../docs/et/api.yaml'));
 const mainSpec = YAML.load(path.join(__dirname, '../calendly-clone-api.yaml'));
 
 // Base SwaggerUI options
@@ -18,16 +17,6 @@ const baseOptions = {
 const englishOptions = {
   ...baseOptions,
   customSiteTitle: "API Documentation (English)",
-  swaggerOptions: {
-    url: null, // Use direct spec object
-    defaultModelsExpandDepth: 1,
-    docExpansion: 'list'
-  }
-};
-
-const estonianOptions = {
-  ...baseOptions,
-  customSiteTitle: "API Dokumentatsioon (Eesti)",
   swaggerOptions: {
     url: null, // Use direct spec object
     defaultModelsExpandDepth: 1,
@@ -57,10 +46,6 @@ router.get('/', (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=300');
     return res.send(swaggerUi.generateHTML(englishSpec, englishOptions));
   } 
-  else if (routePath === '/et') {
-    res.setHeader('Cache-Control', 'public, max-age=300');
-    return res.send(swaggerUi.generateHTML(estonianSpec, estonianOptions));
-  }
   else if (routePath === '/docs') {
     res.setHeader('Cache-Control', 'public, max-age=300');
     return res.send(swaggerUi.generateHTML(mainSpec, mainOptions));

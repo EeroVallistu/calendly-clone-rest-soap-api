@@ -30,7 +30,6 @@ const docsRouter = require('./routes/docs');
 
 // Mount documentation routes at specific paths
 app.use('/en', docsRouter);
-app.use('/et', docsRouter);
 app.use('/docs', docsRouter);
 
 // Root path redirects to documentation based on browser language
@@ -109,7 +108,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API docs available at:`);
   console.log(`  - http://localhost:${PORT}/en (English)`);
-  console.log(`  - http://localhost:${PORT}/et (Estonian)`);
   console.log(`  - http://localhost:${PORT}/docs (Documentation root)`);
 });
 

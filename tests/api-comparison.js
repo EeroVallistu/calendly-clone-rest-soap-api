@@ -310,6 +310,225 @@ async function runTests() {
       console.error('Error details:', error.response ? error.response.data : error.root);
       logTest('Create Schedule', false, error);
     }
+      // Test 6A: Get User
+    console.log('\n--- Test 6A: Get User ---');
+    try {
+      // REST API get user
+      console.log('Getting user via REST API...');
+      const restGetUserResp = await axios.get(
+        `${REST_API_URL}/users/${restUserId}`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get user
+      console.log('Getting user via SOAP API...');
+      const soapGetUserResp = await client.GetUserAsync({
+        token: soapToken,
+        userId: soapUserId
+      });
+      
+      // Verify both APIs returned user data
+      logTest('Both APIs returned user data', 
+        restGetUserResp.data.id === restUserId && 
+        soapGetUserResp[0].user.id === soapUserId);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get User', false, error);
+    }
+    
+    // Test 6B: Update User
+    console.log('\n--- Test 6B: Update User ---');
+    try {
+      const updatedName = "Updated User Name";
+      
+      // REST API update user
+      console.log('Updating user via REST API...');
+      const restUpdateUserResp = await axios.patch(
+        `${REST_API_URL}/users/${restUserId}`,
+        { name: updatedName },
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API update user
+      console.log('Updating user via SOAP API...');
+      const soapUpdateUserResp = await client.UpdateUserAsync({
+        token: soapToken,
+        userId: soapUserId,
+        name: updatedName
+      });
+      
+      // Verify both APIs updated the user
+      logTest('Both APIs updated the user name', 
+        restUpdateUserResp.data.name === updatedName && 
+        soapUpdateUserResp[0].user.name === updatedName);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Update User', false, error);
+    }
+
+    // Test 6C: Get Event
+    console.log('\n--- Test 6C: Get Event ---');
+    try {
+      // REST API get event
+      console.log('Getting event via REST API...');
+      const restGetEventResp = await axios.get(
+        `${REST_API_URL}/events/${restEventId}`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get event
+      console.log('Getting event via SOAP API...');
+      const soapGetEventResp = await client.GetEventAsync({
+        token: soapToken,
+        eventId: soapEventId
+      });
+      
+      // Verify both APIs returned event data
+      logTest('Both APIs returned event data', 
+        restGetEventResp.data.id === restEventId && 
+        soapGetEventResp[0].event.id === soapEventId);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get Event', false, error);
+    }
+    
+    // Test 6D: Update Event
+    console.log('\n--- Test 6D: Update Event ---');
+    try {
+      const updatedDescription = "Updated event description";
+      
+      // REST API update event
+      console.log('Updating event via REST API...');
+      const restUpdateEventResp = await axios.patch(
+        `${REST_API_URL}/events/${restEventId}`,
+        { description: updatedDescription },
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API update event
+      console.log('Updating event via SOAP API...');
+      const soapUpdateEventResp = await client.UpdateEventAsync({
+        token: soapToken,
+        eventId: soapEventId,
+        description: updatedDescription
+      });
+      
+      // Verify both APIs updated the event
+      logTest('Both APIs updated the event description', 
+        restUpdateEventResp.data.description === updatedDescription && 
+        soapUpdateEventResp[0].event.description === updatedDescription);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Update Event', false, error);
+    }
+    
+    // Test 6E: Get Schedules
+    console.log('\n--- Test 6E: Get Schedules ---');
+    try {
+      // REST API get schedules
+      console.log('Getting schedules via REST API...');
+      const restGetSchedulesResp = await axios.get(
+        `${REST_API_URL}/schedules`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get schedules
+      console.log('Getting schedules via SOAP API...');
+      const soapGetSchedulesResp = await client.GetSchedulesAsync({
+        token: soapToken
+      });
+      
+      // Verify both APIs returned schedules
+      const restHasSchedules = restGetSchedulesResp.data.length > 0;
+      const soapHasSchedules = soapGetSchedulesResp[0].schedules.length > 0;
+      
+      logTest('Both APIs returned schedules', restHasSchedules && soapHasSchedules);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get Schedules', false, error);
+    }
+    
+    // Test 6F: Get Schedule
+    console.log('\n--- Test 6F: Get Schedule ---');
+    try {
+      // REST API get schedule
+      console.log('Getting schedule via REST API...');
+      const restGetScheduleResp = await axios.get(
+        `${REST_API_URL}/schedules/${restUserId}`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get schedule
+      console.log('Getting schedule via SOAP API...');
+      const soapGetScheduleResp = await client.GetScheduleAsync({
+        userId: soapUserId
+      });
+      
+      // Verify both APIs returned schedule data
+      logTest('Both APIs returned schedule data', 
+        restGetScheduleResp.data.userId === restUserId && 
+        soapGetScheduleResp[0].schedule.userId === soapUserId);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get Schedule', false, error);
+    }
+    
+    // Test 6G: Update Schedule
+    console.log('\n--- Test 6G: Update Schedule ---');
+    try {
+      // Prepare updated availability data
+      const restScheduleUpdate = {
+        availability: [
+          {
+            day: 'friday',
+            startTime: '09:00',
+            endTime: '14:00'
+          }
+        ]
+      };
+      
+      const soapScheduleUpdate = {
+        availability: {
+          timeSlot: [
+            {
+              day: 'friday',
+              startTime: '09:00',
+              endTime: '14:00'
+            }
+          ]
+        }
+      };
+      
+      // REST API update schedule
+      console.log('Updating schedule via REST API...');
+      const restUpdateScheduleResp = await axios.patch(
+        `${REST_API_URL}/schedules/${restUserId}`,
+        restScheduleUpdate,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API update schedule
+      console.log('Updating schedule via SOAP API...');
+      const soapUpdateScheduleResp = await client.UpdateScheduleAsync({
+        token: soapToken,
+        userId: soapUserId,
+        availability: soapScheduleUpdate.availability
+      });
+      
+      // Verify both APIs updated the schedule
+      logTest('Both APIs updated the schedule', 
+        restUpdateScheduleResp.data && soapUpdateScheduleResp[0].schedule);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Update Schedule', false, error);
+    }
     
     // Test 6: Create Appointment
     console.log('\n--- Test 6: Create Appointment ---');
@@ -364,6 +583,59 @@ async function runTests() {
     if (!restAppointmentId || !soapAppointmentId) {
       console.error('Stopping tests: Failed to create appointments');
       return;
+    }
+      // Test 6H: Get Appointments
+    console.log('\n--- Test 6H: Get Appointments ---');
+    try {
+      // REST API get appointments
+      console.log('Getting appointments via REST API...');
+      const restGetAppointmentsResp = await axios.get(
+        `${REST_API_URL}/appointments`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get appointments
+      console.log('Getting appointments via SOAP API...');
+      const soapGetAppointmentsResp = await client.GetAppointmentsAsync({
+        token: soapToken
+      });
+      
+      // Verify both APIs returned appointments
+      const restHasAppointments = restGetAppointmentsResp.data.length > 0;
+      const soapHasAppointments = soapGetAppointmentsResp[0].appointments.length > 0;
+      
+      logTest('Both APIs returned appointments', restHasAppointments && soapHasAppointments);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get Appointments', false, error);
+    }
+    
+    // Test 6I: Get Appointment
+    console.log('\n--- Test 6I: Get Appointment ---');
+    try {
+      // REST API get appointment
+      console.log('Getting appointment via REST API...');
+      const restGetAppointmentResp = await axios.get(
+        `${REST_API_URL}/appointments/${restAppointmentId}`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get appointment
+      console.log('Getting appointment via SOAP API...');
+      const soapGetAppointmentResp = await client.GetAppointmentAsync({
+        token: soapToken,
+        appointmentId: soapAppointmentId
+      });
+      
+      // Verify both APIs returned appointment data
+      logTest('Both APIs returned appointment data', 
+        restGetAppointmentResp.data.id === restAppointmentId && 
+        soapGetAppointmentResp[0].appointment.id === soapAppointmentId);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get Appointment', false, error);
     }
     
     // Test 7: Update Appointment
@@ -424,6 +696,154 @@ async function runTests() {
       console.error('Error details:', error.response ? error.response.data : error.root);
       logTest('Delete Appointment', false, error);
     }
+      // Test 8A: Delete Schedule
+    console.log('\n--- Test 8A: Delete Schedule ---');
+    try {
+      // We'll create a new schedule first that we can safely delete
+      // Prepare schedule data
+      const restScheduleData = {
+        userId: restUserId,
+        availability: [
+          {
+            day: 'saturday',
+            startTime: '10:00',
+            endTime: '13:00'
+          }
+        ]
+      };
+      
+      const soapScheduleData = {
+        userId: soapUserId,
+        availability: {
+          timeSlot: [
+            {
+              day: 'saturday',
+              startTime: '10:00',
+              endTime: '13:00'
+            }
+          ]
+        }
+      };
+      
+      // Create schedules to delete
+      console.log('Creating temporary schedules to test deletion...');
+      await axios.post(
+        `${REST_API_URL}/schedules`,
+        restScheduleData,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      await client.CreateScheduleAsync({
+        token: soapToken,
+        schedule: soapScheduleData
+      });
+      
+      // REST API delete schedule
+      console.log('Deleting schedule via REST API...');
+      const restDeleteScheduleResp = await axios.delete(
+        `${REST_API_URL}/schedules/${restUserId}`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      console.log(`REST schedule deleted, status: ${restDeleteScheduleResp.status}`);
+      
+      // SOAP API delete schedule
+      console.log('Deleting schedule via SOAP API...');
+      const soapDeleteScheduleResp = await client.DeleteScheduleAsync({
+        token: soapToken,
+        userId: soapUserId
+      });
+      console.log(`SOAP schedule deleted, success: ${soapDeleteScheduleResp[0].success}`);
+      
+      // Verify both APIs deleted the schedule successfully
+      logTest('Both APIs deleted schedule successfully', 
+        restDeleteScheduleResp.status === 204 && 
+        soapDeleteScheduleResp[0].success === true);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Delete Schedule', false, error);
+    }
+    
+    // Test 8B: Delete Event
+    console.log('\n--- Test 8B: Delete Event ---');
+    try {
+      // Creating a test event to delete
+      const testEventData = {
+        name: 'Test Event To Delete',
+        duration: 30,
+        description: 'This event will be deleted',
+        color: '#FF5733'
+      };
+      
+      // Create events to delete
+      console.log('Creating temporary events to test deletion...');
+      const restDeleteEventResp1 = await axios.post(
+        `${REST_API_URL}/events`,
+        testEventData,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      const tempRestEventId = restDeleteEventResp1.data.id;
+      
+      const soapDeleteEventResp1 = await client.CreateEventAsync({
+        token: soapToken,
+        event: testEventData
+      });
+      const tempSoapEventId = soapDeleteEventResp1[0].event.id;
+      
+      // REST API delete event
+      console.log('Deleting event via REST API...');
+      const restDeleteEventResp = await axios.delete(
+        `${REST_API_URL}/events/${tempRestEventId}`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      console.log(`REST event deleted, status: ${restDeleteEventResp.status}`);
+      
+      // SOAP API delete event
+      console.log('Deleting event via SOAP API...');
+      const soapDeleteEventResp = await client.DeleteEventAsync({
+        token: soapToken,
+        eventId: tempSoapEventId
+      });
+      console.log(`SOAP event deleted, success: ${soapDeleteEventResp[0].success}`);
+      
+      // Verify both APIs deleted the event successfully
+      logTest('Both APIs deleted event successfully', 
+        restDeleteEventResp.status === 204 && 
+        soapDeleteEventResp[0].success === true);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Delete Event', false, error);
+    }
+
+    // Test 8C: Get Users
+    console.log('\n--- Test 8C: Get Users ---');
+    try {
+      // REST API get users
+      console.log('Getting users via REST API...');
+      const restGetUsersResp = await axios.get(
+        `${REST_API_URL}/users?page=1&pageSize=10`,
+        { headers: { 'Authorization': `Bearer ${restToken}` } }
+      );
+      
+      // SOAP API get users
+      console.log('Getting users via SOAP API...');
+      const soapGetUsersResp = await client.GetUsersAsync({
+        token: soapToken,
+        page: 1,
+        pageSize: 10
+      });
+      
+      // Verify both APIs returned users
+      const restHasUsers = restGetUsersResp.data.length > 0;
+      const soapHasUsers = soapGetUsersResp[0].users.length > 0;
+      
+      logTest('Both APIs returned users', restHasUsers && soapHasUsers);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Get Users', false, error);
+    }
     
     // Test 9: Logout
     console.log('\n--- Test 9: Logout ---');
@@ -452,7 +872,73 @@ async function runTests() {
       console.error('Error details:', error.response ? error.response.data : error.root);
       logTest('Logout', false, error);
     }
-    
+      // Test 9A: Delete User
+    console.log('\n--- Test 9A: Delete User ---');
+    try {
+      // Create temp users to delete
+      const tempRestUser = {
+        name: 'Temp REST User',
+        email: `temp.rest.${timestamp}.${randomSuffix+1}@example.com`,
+        password: 'password123',
+        timezone: 'Europe/Tallinn'
+      };
+      
+      const tempSoapUser = {
+        name: 'Temp SOAP User',
+        email: `temp.soap.${timestamp}.${randomSuffix+1}@example.com`,
+        password: 'password123',
+        timezone: 'Europe/Tallinn'
+      };
+      
+      // Create users
+      console.log('Creating temporary users to test deletion...');
+      const tempRestUserResp = await axios.post(`${REST_API_URL}/users`, tempRestUser);
+      const tempRestUserId = tempRestUserResp.data.id;
+      
+      const tempSoapUserResp = await client.CreateUserAsync({
+        user: tempSoapUser
+      });
+      const tempSoapUserId = tempSoapUserResp[0].user.id;
+      
+      // Login to get tokens
+      const tempRestLoginResp = await axios.post(`${REST_API_URL}/sessions`, {
+        email: tempRestUser.email,
+        password: tempRestUser.password
+      });
+      const tempRestToken = tempRestLoginResp.data.token;
+      
+      const tempSoapLoginResp = await client.CreateSessionAsync({
+        email: tempSoapUser.email,
+        password: tempSoapUser.password
+      });
+      const tempSoapToken = tempSoapLoginResp[0].token;
+      
+      // REST API delete user
+      console.log('Deleting user via REST API...');
+      const restDeleteUserResp = await axios.delete(
+        `${REST_API_URL}/users/${tempRestUserId}`,
+        { headers: { 'Authorization': `Bearer ${tempRestToken}` } }
+      );
+      console.log(`REST user deleted, status: ${restDeleteUserResp.status}`);
+      
+      // SOAP API delete user
+      console.log('Deleting user via SOAP API...');
+      const soapDeleteUserResp = await client.DeleteUserAsync({
+        token: tempSoapToken,
+        userId: tempSoapUserId
+      });
+      console.log(`SOAP user deleted, success: ${soapDeleteUserResp[0].success}`);
+      
+      // Verify both APIs deleted the user successfully
+      logTest('Both APIs deleted user successfully', 
+        restDeleteUserResp.status === 204 && 
+        soapDeleteUserResp[0].success === true);
+      
+    } catch (error) {
+      console.error('Error details:', error.response ? error.response.data : error.root);
+      logTest('Delete User', false, error);
+    }
+
     // Print test summary
     console.log('\n=== Test Summary ===');
     console.log(`Total tests: ${testResults.total}`);

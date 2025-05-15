@@ -11,7 +11,7 @@ const cors = require('cors');
 dotenv.config();
 
 // Initialize database connection
-const db = new sqlite3.Database('../../database.db');
+const db = new sqlite3.Database('./database.db');
 
 // Create Express app
 const app = express();
@@ -19,11 +19,11 @@ app.use(express.json());
 app.use(cors());
 
 // Serve WSDL file from the static directory
-app.use('/wsdl', express.static(path.join(__dirname, '../../wsdl')));
+app.use('/wsdl', express.static(path.join(__dirname, './wsdl')));
 
 app.get('/wsdl', (req, res) => {
   res.setHeader('Content-Type', 'text/xml');
-  res.sendFile(path.join(__dirname, '../../wsdl/calendly-soap-service.wsdl'));
+  res.sendFile(path.join(__dirname, './wsdl/calendly-soap-service.wsdl'));
 });
 
 // Helper functions
@@ -1525,7 +1525,7 @@ const service = {
 };
 
 // Read WSDL file
-const wsdlPath = path.join(__dirname, '../../wsdl/calendly-soap-service.wsdl');
+const wsdlPath = path.join(__dirname, './wsdl/calendly-soap-service.wsdl');
 const wsdl = fs.readFileSync(wsdlPath, 'utf8');
 
 // Create SOAP server

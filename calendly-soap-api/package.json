@@ -1,0 +1,20 @@
+{
+  "name": "calendly-soap-api",
+  "version": "1.0.0",
+  "description": "SOAP API for Calendly Clone",
+  "scripts": {
+    "start": "node server.js",
+    "client": "cd client && npm start",
+    "install-all": "npm install && cd src && npm install && cd ../client && npm install",
+    "dev": "cd src && npm run dev"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
+    "soap": "^1.1.11",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {}
+}

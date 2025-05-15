@@ -818,13 +818,15 @@ async function runTests() {
 
     // Test 8C: Get Users
     console.log('\n--- Test 8C: Get Users ---');
-    try {
-      // REST API get users
+    try {      // REST API get users
       console.log('Getting users via REST API...');
       const restGetUsersResp = await axios.get(
         `${REST_API_URL}/users?page=1&pageSize=10`,
         { headers: { 'Authorization': `Bearer ${restToken}` } }
       );
+      
+      // Log REST response structure
+      console.log('REST API response structure:', JSON.stringify(restGetUsersResp.data).substring(0, 200) + '...');
       
       // SOAP API get users
       console.log('Getting users via SOAP API...');
@@ -832,11 +834,18 @@ async function runTests() {
         token: soapToken,
         page: 1,
         pageSize: 10
-      });
+      });      // Verify both APIs returned users
+      // Check proper structure for REST API (might be data or data.data)
+      const restData = restGetUsersResp.data;
+      const restUsers = Array.isArray(restData) ? restData : (restData.data && Array.isArray(restData.data) ? restData.data : []);
+      const restHasUsers = restUsers.length > 0;
       
-      // Verify both APIs returned users
-      const restHasUsers = restGetUsersResp.data.length > 0;
-      const soapHasUsers = soapGetUsersResp[0].users.length > 0;
+      // Check if users property exists and is an array before checking length
+      const soapUsers = soapGetUsersResp[0].users;
+      const soapHasUsers = Array.isArray(soapUsers) && soapUsers.length > 0;
+      
+      console.log('REST users count:', restUsers.length);
+      console.log('SOAP users:', soapUsers ? `Found ${soapUsers.length} users` : 'No users array found');
       
       logTest('Both APIs returned users', restHasUsers && soapHasUsers);
       

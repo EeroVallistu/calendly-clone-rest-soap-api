@@ -23,16 +23,26 @@ This project provides both REST and SOAP APIs for the Calendly Clone application
 
 ## Running the Services
 
-You can run both the REST and SOAP APIs concurrently using the scripts defined in package.json:
+You can run both the REST and SOAP APIs concurrently using either the provided shell script or npm commands:
 
 ### Production Mode
-To run both APIs in production mode:
+To run both APIs in production mode using the shell script:
+```bash
+./run.sh
+```
+
+Or using npm:
 ```bash
 npm run start
 ```
 
 ### Run Tests
-To run the API comparison tests:
+To run the API comparison tests using the shell script:
+```bash
+./test.sh
+```
+
+Or using npm:
 ```bash
 npm run test
 ```

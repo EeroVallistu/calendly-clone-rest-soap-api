@@ -28,9 +28,8 @@ const appointmentRoutes = require('./routes/appointments');
 const sessionsRoutes = require('./routes/sessions');
 const docsRouter = require('./routes/docs');
 
-// Mount documentation routes at specific paths
+// Mount documentation route at /en path only
 app.use('/en', docsRouter);
-app.use('/docs', docsRouter);
 
 // Root path redirects to documentation based on browser language
 app.get('/', (req, res) => {
@@ -49,7 +48,7 @@ app.use('/appointments', auth, appointmentRoutes);
 app.use('/sessions', sessionsRoutes);
 
 // Serve static OpenAPI specs from docs directory (for raw YAML access)
-app.use('/docs/specs', express.static(path.join(__dirname, 'docs')));
+app.use('/en/specs', express.static(path.join(__dirname, 'docs')));
 
 // Database initialization
 db.serialize(() => {

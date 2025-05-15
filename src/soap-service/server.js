@@ -18,8 +18,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Serve WSDL file
+// Serve WSDL file from the static directory
 app.use('/wsdl', express.static(path.join(__dirname, '../../wsdl')));
+
+app.get('/wsdl', (req, res) => {
+  res.setHeader('Content-Type', 'text/xml');
+  res.sendFile(path.join(__dirname, '../../wsdl/calendly-soap-service.wsdl'));
+});
 
 // Helper functions
 const isValidEmail = (email) => {
@@ -1529,7 +1534,7 @@ soap.listen(app, '/soap', service, wsdl);
 const PORT = process.env.SOAP_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`SOAP Service running at http://localhost:${PORT}/soap`);
-  console.log(`WSDL available at http://localhost:${PORT}/wsdl/calendly-soap-service.wsdl`);
+  console.log(`View WSDL file at http://localhost:${PORT}/wsdl`);
 });
 
-module.exports = app; 
+module.exports = app;

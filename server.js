@@ -108,7 +108,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API docs available at:`);
   console.log(`  - http://localhost:${PORT}/en (English)`);
-  console.log(`  - http://localhost:${PORT}/docs (Documentation root)`);
 });
 
 module.exports = app;

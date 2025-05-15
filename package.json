@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "start:soap": "cd src/soap-service && node server.js",
-    "start:all": "node start-services.js",
-    "dev": "nodemon -e js,yaml,yml server.js",
-    "dev:all": "concurrently \"npm run dev\" \"cd src/soap-service && npm run dev\"",
+    "start": "concurrently \"cd calendly-soap-api && node server.js\" \"node server.js\"",
     "test": "cd tests && node api-comparison.js"
   },
   "dependencies": {

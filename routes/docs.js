@@ -6,7 +6,6 @@ const path = require('path');
 
 // Load both language versions and main API spec
 const englishSpec = YAML.load(path.join(__dirname, '../docs/en/api.yaml'));
-const mainSpec = YAML.load(path.join(__dirname, '../calendly-clone-api.yaml'));
 
 // Base SwaggerUI options
 const baseOptions = {

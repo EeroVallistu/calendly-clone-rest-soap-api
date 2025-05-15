@@ -1,22 +1,49 @@
-# Calendly Clone SOAP API
+# Calendly Clone API Project
 
-This project provides a SOAP service that mirrors the functionality of the existing Calendly Clone REST API. It includes a WSDL description, a SOAP service implementation, client examples, and automated tests to verify equivalence.
+This project provides both REST and SOAP APIs for the Calendly Clone application. It includes a REST API in the root directory and a SOAP service that mirrors its functionality in the calendly-soap-api directory.
 
 ## Project Structure
 
 ```
 /project-root
- ├── wsdl/                # WSDL file defining the SOAP interface
- ├── src/                 # Source code for the SOAP service
- ├── scripts/             # Startup and utility scripts
- ├── client/              # Client example demonstrating SOAP API usage
+ ├── server.js            # Main REST API entry point
+ ├── routes/              # REST API routes
+ ├── middleware/          # API middleware components
+ ├── calendly-soap-api/   # SOAP API implementation
+ │   ├── server.js        # SOAP API entry point
+ │   └── wsdl/           # WSDL file defining the SOAP interface
  ├── tests/               # Automated tests comparing REST and SOAP APIs
  └── README.md            # This documentation
 ```
 
+## Running the Services
+
+You can run both the REST and SOAP APIs concurrently using the scripts defined in package.json:
+```
+
+## Running the Services
+
+You can run both the REST and SOAP APIs concurrently using the scripts defined in package.json:
+
+### Production Mode
+To run both APIs in production mode:
+```bash
+npm run start:all
+```
+
+### Development Mode (with auto-reload)
+To run both APIs in development mode with nodemon for auto-reload:
+```bash
+npm run dev:all
+```
+
+### Run Individual Services
+- REST API only: `npm run start` or `npm run dev`
+- SOAP API only: `npm run start:soap` or `npm run dev:soap`
+
 ## Features
 
-The SOAP API provides identical functionality to the REST API, including:
+Both the REST and SOAP APIs provide identical functionality, including:
 
 - User management (create, read, update, delete)
 - Authentication (login/logout)

@@ -100,6 +100,19 @@ The services will be available at:
 - SOAP Endpoint: http://localhost:3001/soap
 - WSDL: http://localhost:3001/wsdl
 
+### Using the SOAP Client
+
+A sample SOAP client is provided to demonstrate calls to all SOAP operations. To run the client:
+
+```bash
+node calendly-soap-api/client/client.js
+```
+
+This will:
+1. Create a user, login, and obtain a token
+2. Demonstrate all CRUD operations on users, events, schedules, and appointments
+3. Show the complete lifecycle of resources including creation and deletion
+
 ## Testing
 
 The tests verify that the SOAP API provides equivalent functionality to the REST API by comparing responses from both.

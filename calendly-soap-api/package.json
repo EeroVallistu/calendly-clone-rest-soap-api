@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "description": "SOAP API for Calendly Clone",
   "scripts": {
-    "start": "node server.js",
-    "client": "cd client && npm start",
-    "install-all": "npm install && cd src && npm install && cd ../client && npm install",
-    "dev": "cd src && npm run dev"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

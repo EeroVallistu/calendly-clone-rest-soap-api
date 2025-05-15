@@ -2,16 +2,13 @@ const express = require('express');
 const soap = require('soap');
 const fs = require('fs');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const db = require('./db'); // Use the db module that connects to parent database
 
 // Load environment variables
 dotenv.config();
-
-// Initialize database connection
-const db = new sqlite3.Database('./database.db');
 
 // Create Express app
 const app = express();

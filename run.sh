@@ -27,4 +27,4 @@ fi
 
 # Start both REST and SOAP services
 echo "Starting REST and SOAP APIs..."
-npm start
+exec npm start

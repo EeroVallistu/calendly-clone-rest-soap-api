@@ -30,7 +30,7 @@ fi
 
 # Run the API comparison tests
 echo "Running API comparison tests..."
-node api-comparison.js
+node $(dirname "$0")/api-comparison.js
 
 # Check if tests were successful
 if [ $? -eq 0 ]; then
